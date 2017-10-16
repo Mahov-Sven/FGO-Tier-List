@@ -1,0 +1,65 @@
+#content{
+	overflow: hidden;
+	height: 100vh;
+	max-width: 700pt;
+	background-color: rgba(100, 128, 256, 0.7);
+	margin: auto;
+	box-sizing: border-box;
+	border-color: rgba(200, 200, 256, 0.8);
+	border-width: 0pt 20pt;
+	border-style: solid;
+	padding: 0pt 10pt;
+}
+	#owner{
+		width: 100%;
+		height: auto;
+		text-align: center;
+		color: gold;
+		font-size: 20pt;
+		font-weight: bold;
+		text-shadow: 0pt 0pt 10pt black;
+		padding: 10pt 0pt;
+	}
+	
+	#options{
+		width: 100%;
+		height: auto;
+	}
+	
+		#JP{
+			width: 25%;
+			float: left;
+			text-align: center;
+		}
+		
+		#US{
+			width: 25%;
+			float: left;
+			text-align: center;
+		}
+		
+		#tierBy{
+			width: 40%;
+			float: left;
+			text-align: center;
+		}
+		
+		#stats{
+			width: 10%;
+			height: 100%;
+			float: left;
+			background-color: red;
+			text-align: center;
+		}
+		
+		
+	
+	#tierList{
+	
+	}
+
+*{
+	padding: 0;
+	margin: 0;
+	font-family: "Verdana";
+}
