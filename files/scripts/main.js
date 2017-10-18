@@ -1,11 +1,12 @@
-function globals(){}
+function globals() {
+}
 globals.banners = 2;
 globals.servants = 1;
 
 const servants = [];
 const measures = new Set();
 
-function setBanner(bannerID){
+function setBanner(bannerID) {
 	document.body.style.backgroundImage = "url(files/images/banners/banner" + bannerID + ".png)";
 	document.body.style.backgroundRepeat = "no-repeat";
 	document.body.style.backgroundAttachment = "fixed";
@@ -13,13 +14,13 @@ function setBanner(bannerID){
 	document.body.style.backgroundSize = "cover"
 }
 
-function handleOptionClick(e){
+function handleOptionClick(e) {
 	$(".Option").removeClass("OptionActive");
 	$(this).addClass("OptionActive");
-	
+
 	const id = $(this).attr("id");
-	
-	switch(id){
+
+	switch (id) {
 	case "STATS":
 		clearContentSpace();
 		generateStatsTable();
@@ -27,32 +28,26 @@ function handleOptionClick(e){
 	}
 }
 
-function clearContentSpace(){
+function clearContentSpace() {
 	$("#CONTENT_SPACE").empty();
 }
 
-function generateStatsTable(){
-	const tableBase = $("<table>");
-	const div = $("<div>");
-	div.attr("background-color", "black");
-	div.attr("height", "10px");
-	div.attr("width", "10px");
-	$("#CONTENT_SPACE").append(div);
+function generateStatsTable() {
+	const table = Util.createTable(measures, servants, "Table", "HeaderRow");
+	$("#CONTENT_SPACE").append(table);
 }
 
 $(document).ready(() => {
-	setBanner(randomInt(1, globals.banners));
-	
+	setBanner(Util.randomInt(1, globals.banners));
+
 	$(".Option").click(handleOptionClick);
-	
-	for(let id = 1; id <= globals.servants; id++){
+
+	for (let id = 1; id <= globals.servants; id++) {
 		Loader.loadServantFile(id, (servant) => {
 			servants.push(servant);
-			for(const measure in servant){
+			for (const measure in servant) {
 				measures.add(measure);
 			}
 		});
 	}
-	console.log(servants);
-	console.log(measures);
 });
