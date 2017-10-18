@@ -8,7 +8,7 @@
 	border-color: rgba(200, 200, 256, 0.8);
 	border-width: 0pt 20pt;
 	border-style: solid;
-	padding: 0pt 10pt;
+	padding: 0pt 0pt;
 }
 	#owner{
 		width: 100%;
@@ -21,45 +21,78 @@
 		padding: 10pt 0pt;
 	}
 	
+	.Separator{
+		background-color: rgb(50, 50, 50);
+		width: 100%;
+	}
+	
 	#options{
 		width: 100%;
 		height: auto;
+		overflow: auto;
 	}
+		.Option{}
+		
+		.ActiveOption{}
+		
+		.OptionText{
+			color: white;
+			font-size: 16pt;
+			font-weight: bold;
+			text-shadow: 0pt 0pt 8pt black;
+		}
+		
+		.OptionUnderline{
+			background-color: rgb(220, 220, 220);
+			width: 100%;
+			opacity: 0.0;
+		}
+		
+		.Option:hover > .OptionUnderline{
+			opacity: 0.5;
+		}
+		
+		.Option:active > .OptionUnderline{
+			opacity: 1.0;
+		}
+		
+		.OptionActive > .OptionUnderline{
+			opacity: 1.0;
+		}
 	
 		#JP{
-			width: 25%;
+			width: 20%;
 			float: left;
 			text-align: center;
 		}
 		
 		#US{
-			width: 25%;
+			width: 20%;
 			float: left;
 			text-align: center;
 		}
 		
-		#tierBy{
-			width: 40%;
+		#SORT_BY{
+			width: 50%;
 			float: left;
 			text-align: center;
 		}
 		
-		#stats{
+		#STATS{
 			width: 10%;
-			height: 100%;
 			float: left;
-			background-color: red;
 			text-align: center;
 		}
 		
 		
 	
-	#tierList{
-	
+	#CONTENT_SPACE{
+		width: 100%;
 	}
 
 *{
 	padding: 0;
 	margin: 0;
 	font-family: "Verdana";
+	user-select: none;
 }
