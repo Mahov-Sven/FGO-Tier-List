@@ -1,7 +1,7 @@
 function globals() {
 }
 globals.banners = 2;
-globals.servants = 1;
+globals.servants = 2;
 
 const servants = [];
 const measures = new Set();
@@ -14,27 +14,39 @@ function setBanner(bannerID) {
 	document.body.style.backgroundSize = "cover"
 }
 
+function orderServantsBy(servants, measure, measures){
+	
+}
+
+function createSearchWidget(table){
+	
+}
+
+function createTableHeaderWidget(table, name){
+	
+}
+
 function handleOptionClick(e) {
 	$(".Option").removeClass("OptionActive");
 	$(this).addClass("OptionActive");
 
 	const id = $(this).attr("id");
-
+	$("#CONTENT_SPACE").empty();
 	switch (id) {
+	case "JP":
+		break;
+	case "US":
+		break;
+	case "SORT_BY":
+		break;
 	case "STATS":
-		clearContentSpace();
-		generateStatsTable();
+		const table = Util.createOrderedTable("STATS_TABLE", measures, servants, undefined, "Table", createSearchWidget, 
+				createTableHeaderWidget, "HeaderRow", "HeaderCell", "DataRowOdd", 
+				"DataRowEven", "DataCell");
+		
+		$("#CONTENT_SPACE").append(table);
 		break;
 	}
-}
-
-function clearContentSpace() {
-	$("#CONTENT_SPACE").empty();
-}
-
-function generateStatsTable() {
-	const table = Util.createTable(measures, servants, "Table", "HeaderRow");
-	$("#CONTENT_SPACE").append(table);
 }
 
 $(document).ready(() => {

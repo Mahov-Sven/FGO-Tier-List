@@ -4,7 +4,7 @@ class Util {
 		return Math.round(Math.random() * (max - min)) + min;
 	}
 
-	static createTable(headers, dataRows, tableClass = undefined, headerRowClass = undefined, headerCellClass = undefined, dataRowClass = undefined, dataCellClass = undefined) {
+	static createOrderedTable(tableName, headers, dataRows, measure = undefined, tableClass = undefined, searchWidgetFnc, headerWidgetFnc, headerRowClass = undefined, headerCellClass = undefined, dataRowOddClass, dataRowEvenClass = undefined, dataCellClass = undefined) {
 		const table = $("<table>");
 		if (tableClass !== undefined) table.addClass(tableClass);
 
@@ -16,13 +16,16 @@ class Util {
 			if (headerCellClass !== undefined) headerCell.addClass(headerCellClass);
 
 			headerCell.text(header);
+			headerCell.attr("id", `${tableName}_HEADER<${header}>`);
 			headerRow.append(headerCell); }
 		table.append(headerRow);
 
 		/* Data */
+		let row = 1;
 		for (const data of dataRows) {
 			const dataRow = $("<tr>");
-			if (dataRowClass !== undefined) dataRow.addClass(dataRowClass);
+			if (row % 2 === 1 && dataRowOddClass !== undefined) dataRow.addClass(dataRowOddClass);
+			if (row % 2 === 0 && dataRowEvenClass !== undefined) dataRow.addClass(dataRowEvenClass);
 
 			for (const header of headers) {
 				const dataCell = $("<td>");
@@ -32,6 +35,7 @@ class Util {
 				dataRow.append(dataCell);
 			}
 			table.append(dataRow);
+			row++;
 		}
 
 		return table;

@@ -1,5 +1,4 @@
 #content{
-	overflow: hidden;
 	height: 100vh;
 	max-width: 700pt;
 	background-color: rgba(100, 128, 256, 0.7);
@@ -9,29 +8,38 @@
 	border-width: 0pt 10pt;
 	border-style: solid;
 	padding: 0pt 0pt;
+	display: flex;
+	flex-direction: column;
 }
 	#owner{
 		width: 100%;
-		height: auto;
 		text-align: center;
 		color: gold;
 		font-size: 20pt;
 		font-weight: bold;
 		text-shadow: 0pt 0pt 10pt black;
 		padding: 10pt 0pt;
+		flex: 0 0 auto;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: center;
 	}
+		.FlexSpacer{
+			flex: 1 1 auto;
+		}
 	
-	.Separator{
-		background-color: rgb(50, 50, 50);
-		width: 100%;
-	}
+		.OwnerPart{
+			flex: 0 0 auto;
+		}
 	
 	#options{
 		width: 100%;
-		height: auto;
-		overflow: auto;
+		flex: 0 0 auto;
 	}
-		.Option{}
+		.Option{
+			cursor: pointer;
+		}
 		
 		.ActiveOption{}
 		
@@ -84,18 +92,55 @@
 			text-align: center;
 		}
 		
-		
+	.Separator{
+		background-color: rgb(50, 50, 50);
+		width: 100%;
+		flex: 0 0 auto;
+	}
 	
 	#CONTENT_SPACE{
 		width: 100%;
+		overflow: auto;
+		flex: 1 0 auto;
 	}
 	
 		.Table{
 			border-spacing: 0;
+			border-collapse: collapse;
 		}
 	
 		.HeaderRow{
 			background-color: rgba(256, 256, 256, 0.2);
+		}
+		
+		.HeaderCell{
+			font-size: 15pt;
+			white-space: nowrap;
+			padding: 0pt 5pt;
+			border-width: 0pt 2pt;
+			border-color: rgba(64, 64, 64, 0.3);
+			border-style: solid;
+			cursor: pointer;
+		}
+		
+		.DataRowOdd{
+			
+		}
+		
+		.DataRowEven{
+			background-color: rgba(0, 0, 0, 0.1);
+		}
+		
+		.DataCell{
+			text-align: center;
+			color: black;
+			font-weight: bold;
+			font-size: 12pt;
+			white-space: nowrap;
+			padding: 0pt 5pt;
+			border-width: 0pt 2pt;
+			border-color: rgba(64, 64, 64, 0.3);
+			border-style: solid;
 		}
 
 *{
@@ -103,4 +148,5 @@
 	margin: 0;
 	font-family: "Verdana";
 	user-select: none;
+	overflow: hidden;
 }
