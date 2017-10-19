@@ -108,6 +108,12 @@
 			border-spacing: 0;
 			border-collapse: collapse;
 		}
+		
+		.HeaderSearchImg{
+			width: 16pt;
+			margin: 3pt 0pt 0pt 0pt;
+			padding: 0pt;
+		}
 	
 		.HeaderRow{
 			background-color: rgba(256, 256, 256, 0.2);

@@ -4,7 +4,10 @@ class Util {
 		return Math.round(Math.random() * (max - min)) + min;
 	}
 
-	static createOrderedTable(tableName, headers, dataRows, measure = undefined, tableClass = undefined, searchWidgetFnc, headerWidgetFnc, headerRowClass = undefined, headerCellClass = undefined, dataRowOddClass, dataRowEvenClass = undefined, dataCellClass = undefined) {
+	static createTable(tableName, headers, dataRows, tableClass = undefined, headerRowClass = undefined, 
+	        headerCellClass = undefined, dataRowOddClass = undefined, dataRowEvenClass = undefined, 
+	        dataCellClass = undefined) {
+	    
 		const table = $("<table>");
 		if (tableClass !== undefined) table.addClass(tableClass);
 
