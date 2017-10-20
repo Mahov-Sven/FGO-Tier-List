@@ -19,7 +19,7 @@ class Util {
 			if (headerCellClass !== undefined) headerCell.addClass(headerCellClass);
 
 			headerCell.text(header);
-			headerCell.attr("id", `${tableName}_HEADER<${header}>`);
+			headerCell.attr("id", `${tableName}.${header}`);
 			headerRow.append(headerCell); }
 		table.append(headerRow);
 
@@ -33,8 +33,9 @@ class Util {
 			for (const header of headers) {
 				const dataCell = $("<td>");
 				if (dataCellClass !== undefined) dataCell.addClass(dataCellClass);
-
+				
 				dataCell.text(data[header]);
+				dataCell.attr("id", `${tableName}.${header}.${data[header]}`);
 				dataRow.append(dataCell);
 			}
 			table.append(dataRow);
