@@ -1,5 +1,16 @@
 class Util {
 
+    /**
+	 * Returns a random integer between the minimum and maximum, inclusive. The
+	 * default minimum is zero, maximum must be provided.
+	 * 
+	 * @param {number}
+	 *            min - The minimum value. Default 0.
+	 * @param {number}
+	 *            max - The maximum value.
+	 * 
+	 * @return {number} A random integer between min and max
+	 */
 	static randomInt(min = 0, max) {
 		return Math.round(Math.random() * (max - min)) + min;
 	}
@@ -43,5 +54,195 @@ class Util {
 		}
 
 		return table;
+	}
+}
+
+
+class DataMatrix {
+
+	constructor(rows, columns){
+		this.matrix = [];
+		this.rows = rows;
+		this.columns = columns;
+		
+		for(let r = 0; r < this.rows; r++){
+			this.matrix[r] = [];
+			for(let c = 0; c < this.columns; c++){
+				this.matrix[r][c] = undefined;
+			}
+		}
+	}
+	
+	get(row, column){
+		return this.matrix[row][column];
+	}
+	
+	getRow(row){
+		const result = [];
+		for(let column = 0; column < this.columns; column++){
+			result.push(this.matrix[row][column]);
+		}
+		return result;
+	}
+	
+	getRows(rowStart, rowEnd){
+		const rmo = this.rows - 1;
+		rowEnd = rowEnd === undefined ? rmo : (rowEnd > rmo ? rmo : rowEnd);
+		
+		const result = [];
+		for(let row = rowStart; row <= rowEnd; row++){
+			result.push(this.getRow(row));
+		}
+		return result;
+	}
+	
+	getCol(column){
+		const result = [];
+		for(let row = 0; row < this.rows; row++){
+			result.push(this.matrix[row][column]);
+		}
+		return result;
+	}
+	
+	set(row, column, object){
+		this.matrix[row][column] = object;
+	}
+	
+	setRow(row, objects){
+		let column = 0;
+		for(const object of objects){
+			if(column >= this.columns) break;
+			this.matrix[row][column] = object;
+			column++;
+		}
+	}
+	
+	setCol(column, objects){
+		let row = 0;
+		for(const object of objects){
+			if(row >= this.rows) break;
+			this.matrix[row][column] = object;
+			row++;
+		}
+	}
+}
+
+
+class Table {
+
+	constructor(name, headers, dataArray) {
+		this.name = name;
+		this.dataMatrix = new DataMatrix([...dataArray].length + 1, [...headers].length);
+		
+		this.setHeaders(headers);
+		this.setDataArray(dataArray);
+		this.table = {
+			element: undefined,
+			headerRow: undefined,
+			headerCells: [],
+			dataRowOdd: [],
+			dataRowEven: [],
+			dataCells: []
+		}
+		this._constructTableElement();
+	}
+	
+	_constructTableElement(){
+		const table = $("<table>");
+
+		/* Header */
+		const headerRow = $("<tr>");
+		this.table.headerRow = headerRow;
+		for (const header of this.dataMatrix.getRow(0)) {
+			const headerCell = $("<th>");
+			
+			headerCell.text(header);
+			headerCell.attr("id", `${this.name}.${header}`);
+			headerRow.append(headerCell); 
+			
+			this.table.headerCells.push(headerCell);
+		}
+		
+		
+		table.append(headerRow);
+
+		/* Data */
+		for (let row = 1; row < this.dataMatrix.rows; row++) {
+			const dataR = this.dataMatrix.getRow(row);
+			const dataRow = $("<tr>");
+			
+			if(row % 2 == 0) this.table.dataRowEven.push(dataRow);
+			if(row % 2 == 1) this.table.dataRowOdd.push(dataRow);
+			
+			for (let col = 0; col < this.dataMatrix.columns; col++) {
+				const dataC = dataR[col];
+				const header = this.dataMatrix.get(0, col);
+				const dataCell = $("<td>");
+				
+				dataCell.text(dataC);
+				dataCell.attr("id", `${this.name}.${header}.${dataC}`);
+				dataRow.append(dataCell);
+				
+				this.table.dataCells.push(dataCell);
+			}
+			table.append(dataRow);
+		}
+		
+		this.table.element = table;
+	}
+	
+	setHeaders(headers){
+		this.dataMatrix.setRow(0, headers);
+	}
+	
+	
+	setDataArray(dataArray){
+		for(let col = 0; col < this.dataMatrix.columns; col++){
+			const header = this.dataMatrix.get(0, col);
+			for(let row = 1; row < this.dataMatrix.rows; row++){
+				this.dataMatrix.set(row, col, dataArray[row - 1][header]);
+			}
+		}
+	}
+	
+	setTableClass(name){
+		this.table.element.addClass(name);
+	}
+	
+	setHeaderRowClass(name){
+		this.table.headerRow.addClass(name);
+	}
+	
+	setHeaderRowCellClass(name){
+		this.table.headerCells.forEach((elem, index, array) => {
+			elem.addClass(name);
+		});
+	}
+	
+	setDataRowOddClass(name){
+		this.table.dataRowOdd.forEach((elem, index, array) => {
+			elem.addClass(name);
+		});
+	}
+	
+	setDataRowEvenClass(name){
+		this.table.dataRowEven.forEach((elem, index, array) => {
+			elem.addClass(name);
+		});
+	}
+	
+	setDataRowClass(name){
+		this.setDataRowOddClass(name);
+		this.setDataRowEvenClass(name);
+	}
+	
+	setDataCellClass(name){
+		this.table.dataCells.forEach((elem, index, array) => {
+			elem.addClass(name);
+		});
+	}
+	
+	getElement(){
+		return this.table.element[0];
 	}
 }

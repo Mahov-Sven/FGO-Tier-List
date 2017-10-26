@@ -7,6 +7,12 @@ const servants = [];
 const measures = new Set();
 const searchMap = new Map();
 
+const x = new DataMatrix(5, 4);
+console.log(x);
+
+const y = new Table("Test", ["row 0", "row 1"], [{"row 0": "00", "row 1": "10"}, {"row 0": "01", "row 1": "11"} ]);
+console.log(y);
+
 function setBanner(bannerID) {
 	document.body.style.backgroundImage = "url(files/images/banners/banner" + bannerID + ".png)";
 	document.body.style.backgroundRepeat = "no-repeat";
@@ -15,64 +21,25 @@ function setBanner(bannerID) {
 	document.body.style.backgroundSize = "cover"
 }
 
-function orderServantsBy(servants, measure, measures){
-	
-}
-
-function createSearchWidget(table){
-	
-}
-
-function createTableHeaderWidget(table, name){
-	
-}
-
-function createOrderedTable(tableName, headers, data, tableClass, headerRowClass, 
-        headerCellClass, DataRowOddClass, DataRowEvenClass, DataCellClass){
-    
-    const table = Util.createTable(tableName, headers, data, tableClass, headerRowClass,
-            headerCellClass, DataRowOddClass, DataRowEvenClass, DataCellClass);
-            
-    const wrapper = $("<div>");
-    wrapper.css("position", "absolute");
-    
-    const sideTable = $("<table>");
-    sideTable.addClass(tableClass);
-    
-    for(let r = 0; r <= data.length; r++){
-        let cell = undefined;
-        const row = $("<tr>");
-        
-        if(r === 0){
-            row.addClass(headerRowClass);
-            
-            const img = $("<img>");
-            img.attr("src", "files/images/search.png");
-            img.addClass("HeaderSearchImg");
-            cell = $("<th>");
-            cell.addClass(headerCellClass);
-            cell.append(img);
-        }else{
-            row.addClass(DataRowOddClass);
-            
-            cell = $("<td>");
-            cell.text(r);
-            cell.addClass(DataCellClass);
-        }
-        row.append(cell);
-        sideTable.append(row);
-    }
-    
-    wrapper.append(sideTable);
-    wrapper.append(table);
-    
-    return wrapper;
-}
-
 function statsOption(){
     const tableName = "StatsTable";
-    const table = createOrderedTable(tableName, measures, servants, "Table", 
-            "HeaderRow", "HeaderCell", "DataRowOdd", "DataRowEven", "DataCell");
+//    const table = createOrderedTable(tableName, measures, servants, "Table", 
+//            "HeaderRow", "HeaderCell", "DataRowOdd", "DataRowEven", "DataCell");
+    const table = new Table(tableName, measures, servants);
+    
+    table.setTableClass("Table");
+    table.setHeaderRowClass("HeaderRow");
+    table.setHeaderRowCellClass("HeaderCell");
+    table.setDataRowOddClass("DataRowOdd");
+    table.setDataRowEvenClass("DataRowEven");
+    table.setDataCellClass("DataCell");
+    
+    const wrapper = $("<div>");
+    wrapper.addClass("TableWrapper");
+    wrapper.append(table.getElement());
+    
+    $("#CONTENT_SPACE").append(wrapper);
+    
     searchMap.clear();
     for(const measure of measures){
         searchMap.set(measure, `${tableName}.${measure}`);
@@ -81,7 +48,6 @@ function statsOption(){
         const value = servant["Name"];
         searchMap.set(value.toString(), `${tableName}.Name.${value}`);
     }
-    $("#CONTENT_SPACE").append(table);
     console.log(searchMap);
 }
 

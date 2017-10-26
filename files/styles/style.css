@@ -100,14 +100,17 @@
 	
 	#CONTENT_SPACE{
 		width: 100%;
-		overflow: auto;
+		overflow: hidden;
 		flex: 1 0 auto;
 	}
+		.TableWrapper{
+			overflow: auto;
+			width: 100%;
+		}
 	
 		.Table{
 			border-spacing: 0;
 			border-collapse: collapse;
-			float: left;
 		}
 		
 		.HeaderSearchImg{
