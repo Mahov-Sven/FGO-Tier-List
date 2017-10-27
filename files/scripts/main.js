@@ -25,7 +25,7 @@ function statsOption(){
     const tableName = "StatsTable";
 //    const table = createOrderedTable(tableName, measures, servants, "Table", 
 //            "HeaderRow", "HeaderCell", "DataRowOdd", "DataRowEven", "DataCell");
-    const table = new Table(tableName, measures, servants);
+    const table = new OrderedTable(tableName, measures, servants);
     
     table.setTableClass("Table");
     table.setHeaderRowClass("HeaderRow");
@@ -34,11 +34,7 @@ function statsOption(){
     table.setDataRowEvenClass("DataRowEven");
     table.setDataCellClass("DataCell");
     
-    const wrapper = $("<div>");
-    wrapper.addClass("TableWrapper");
-    wrapper.append(table.getElement());
-    
-    $("#CONTENT_SPACE").append(wrapper);
+    $("#CONTENT_SPACE").append(table.getElement());
     
     searchMap.clear();
     for(const measure of measures){

@@ -138,7 +138,8 @@ class Table {
 		this.setDataArray(dataArray);
 		this.table = {
 			element: undefined,
-			headerRow: undefined,
+			tables: [],
+			headerRow: [],
 			headerCells: [],
 			dataRowOdd: [],
 			dataRowEven: [],
@@ -152,7 +153,7 @@ class Table {
 
 		/* Header */
 		const headerRow = $("<tr>");
-		this.table.headerRow = headerRow;
+		this.table.headerRow = [headerRow];
 		for (const header of this.dataMatrix.getRow(0)) {
 			const headerCell = $("<th>");
 			
@@ -188,6 +189,7 @@ class Table {
 			table.append(dataRow);
 		}
 		
+		this.table.tables.push(table);
 		this.table.element = table;
 	}
 	
@@ -206,11 +208,15 @@ class Table {
 	}
 	
 	setTableClass(name){
-		this.table.element.addClass(name);
+		this.table.tables.forEach((elem, index, array) => {
+			elem.addClass(name);
+		});
 	}
 	
 	setHeaderRowClass(name){
-		this.table.headerRow.addClass(name);
+		this.table.headerRow.forEach((elem, index, array) => {
+			elem.addClass(name);
+		});
 	}
 	
 	setHeaderRowCellClass(name){
@@ -244,5 +250,64 @@ class Table {
 	
 	getElement(){
 		return this.table.element[0];
+	}
+}
+
+class OrderedTable extends Table {
+	
+	constructor(name, headers, dataArray, defaultOrderHeader, isAscending){
+		super(name, headers, dataArray);
+		this.name = name;
+		this.dataMatrix = new DataMatrix([...dataArray].length + 1, [...headers].length);
+		
+		this.setHeaders(headers);
+		this.setDataArray(dataArray);
+		this.table = {
+			element: undefined,
+			tables: [],
+			headerRow: [],
+			headerCells: [],
+			dataRowOdd: [],
+			dataRowEven: [],
+			dataCells: []
+		}
+		this.orderHeading = defaultOrderHeader;
+		this.isAscending = isAscending;
+		
+		this._constructTableElement();
+	}
+	
+	_constructTableElement(){
+		const name = this.name;
+		this.name = `${name}.dataTable`;
+		super._constructTableElement();
+		
+		const wrapper = $("<div>");
+		
+		const header = [""];
+		const height = this.dataMatrix.rows - 1;
+		
+		const places = [];
+		for(let i = 0; i < height; i++){
+			const value = i + 1;
+			places.push({"" : value});
+		}
+		
+		const placeTable = new Table(`${name}.PlacementTable`, header, places);
+		
+		placeTable.table.headerRow.every( (elem, index, array) => {this.table.headerRow.push(elem)});
+		placeTable.table.headerCells.every( (elem, index, array) => {this.table.headerCells.push(elem)});
+		placeTable.table.dataRowOdd.every( (elem, index, array) => {this.table.dataRowOdd.push(elem)});
+		placeTable.table.dataRowEven.every( (elem, index, array) => {this.table.dataRowEven.push(elem)});
+		placeTable.table.dataCells.every( (elem, index, array) => {this.table.dataCells.push(elem)});
+		
+		// Place all table (tag only, not content) into this.table.tables
+		this.table.tables.push(placeTable.table.);
+		this.table.dataTable = this.table.element;
+		
+		wrapper.append(this.table.placmentTable);
+		wrapper.append(this.table.dataTable);
+		
+		this.table.element = wrapper;
 	}
 }
