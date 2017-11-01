@@ -7,12 +7,6 @@ const servants = [];
 const measures = new Set();
 const searchMap = new Map();
 
-const x = new DataMatrix(5, 4);
-console.log(x);
-
-const y = new Table("Test", ["row 0", "row 1"], [{"row 0": "00", "row 1": "10"}, {"row 0": "01", "row 1": "11"} ]);
-console.log(y);
-
 function setBanner(bannerID) {
 	document.body.style.backgroundImage = "url(files/images/banners/banner" + bannerID + ".png)";
 	document.body.style.backgroundRepeat = "no-repeat";
@@ -27,12 +21,14 @@ function statsOption(){
 //            "HeaderRow", "HeaderCell", "DataRowOdd", "DataRowEven", "DataCell");
     const table = new OrderedTable(tableName, measures, servants);
     
+    table.setWrapperClass("TableWrapper");
     table.setTableClass("Table");
     table.setHeaderRowClass("HeaderRow");
     table.setHeaderRowCellClass("HeaderCell");
     table.setDataRowOddClass("DataRowOdd");
     table.setDataRowEvenClass("DataRowEven");
     table.setDataCellClass("DataCell");
+    
     
     $("#CONTENT_SPACE").append(table.getElement());
     

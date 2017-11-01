@@ -104,13 +104,14 @@
 		flex: 1 0 auto;
 	}
 		.TableWrapper{
-			overflow: auto;
 			width: 100%;
+			white-space: nowrap;
+			overflow: auto;
+			display: inline-block;
 		}
 	
 		.Table{
 			border-spacing: 0;
-			border-collapse: collapse;
 		}
 		
 		.HeaderSearchImg{
@@ -127,7 +128,7 @@
 			font-size: 15pt;
 			white-space: nowrap;
 			padding: 0pt 5pt;
-			border-width: 0pt 2pt;
+			border-width: 0pt 1pt;
 			border-color: rgba(64, 64, 64, 0.3);
 			border-style: solid;
 			cursor: pointer;
@@ -148,9 +149,13 @@
 			font-size: 12pt;
 			white-space: nowrap;
 			padding: 0pt 5pt;
-			border-width: 0pt 2pt;
+			border-width: 0pt 1pt;
 			border-color: rgba(64, 64, 64, 0.3);
 			border-style: solid;
+		}
+		
+		.Table .DataCell + .DataCell {
+			
 		}
 
 *{
