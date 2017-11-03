@@ -21,7 +21,8 @@ function statsOption(){
 //            "HeaderRow", "HeaderCell", "DataRowOdd", "DataRowEven", "DataCell");
     const table = new OrderedTable(tableName, measures, servants);
     
-    table.setWrapperClass("TableWrapper");
+    table.setMacroWrapperClass("MacroWrapper");
+    table.setTableWrapperClass("TableWrapper");
     table.setTableClass("Table");
     table.setHeaderRowClass("HeaderRow");
     table.setHeaderRowCellClass("HeaderCell");

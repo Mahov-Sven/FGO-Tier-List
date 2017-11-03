@@ -73,6 +73,10 @@ class DataMatrix {
 		}
 	}
 	
+	sortByCol(measure){
+		this.matrix.sort(measure);
+	}
+	
 	get(row, column){
 		return this.matrix[row][column];
 	}
@@ -143,6 +147,13 @@ class Table {
 		this._updateTable();
 	}
 	
+	_constructHeaderCellElement(text, id){
+		const headerCell = $("<th>");
+		headerCell.text(text);
+		headerCell.attr("id", id);
+		return headerCell;
+	}
+	
 	_constructTableElement(name, dataMatrix){
 		
 		const tableElement = {
@@ -162,10 +173,7 @@ class Table {
 		const headerRow = $("<tr>");
 		tableElement.headerRow = [headerRow];
 		for (const header of dataMatrix.getRow(0)) {
-			const headerCell = $("<th>");
-			
-			headerCell.text(header);
-			headerCell.attr("id", `${name}.${header}`);
+			const headerCell = this._constructHeaderCellElement(header, `${name}.${header}`);
 			headerRow.append(headerCell); 
 			
 			tableElement.headerCells.push(headerCell);
@@ -281,8 +289,20 @@ class Table {
 
 class OrderedTable extends Table{
 	
-	constructor(name, headers, dataArray, sortedHeaders, isAscending = true) {
+	constructor(name, headers, dataArray, primaryHeader, isAscending = true) {
 		super(name, headers, dataArray);
+		
+		
+	}
+	
+	_constructHeaderCellElement(text, id){
+		const headerCell = super._constructHeaderCellElement(text, id);
+		
+		headerCell.click((Event) => {
+			
+		});
+		
+		return headerCell;
 	}
 	
 	_constructTableElement(name, dataMatrix){
@@ -302,7 +322,8 @@ class OrderedTable extends Table{
 		
 		const tableElement = {
 				element: undefined,
-				wrappers: [],
+				macroWrappers: [],
+				tableWrappers: [],
 				tables: [],
 				headerRow: [],
 				headerCells: [],
@@ -319,26 +340,69 @@ class OrderedTable extends Table{
 		tableElement.dataCells = [...dataTable.dataCells, ...placeTable.dataCells];
 		
 		const dataTableWrapper = $("<div>");
+		dataTableWrapper.css("flex", "1 1 auto");
+		dataTableWrapper.css("overflow", "auto");
 		dataTableWrapper.append(dataTable.element);
-		tableElement.wrappers.push(dataTableWrapper);
+		tableElement.tableWrappers.push(dataTableWrapper);
 		
 		const placeTableWrapper = $("<div>");
+		placeTableWrapper.css("flex", "0 0 auto");
 		placeTableWrapper.append(placeTable.element);
-		tableElement.wrappers.push(placeTableWrapper);
+		tableElement.tableWrappers.push(placeTableWrapper);
 		
 		const wrapper = $("<div>");
-		
+		wrapper.css("display", "inline-flex");
 		wrapper.append(placeTableWrapper);
 		wrapper.append(dataTableWrapper);
 		wrapper.attr("id", `${name}`);
 		tableElement.element = wrapper;
-		tableElement.wrappers.push(wrapper);
+		tableElement.macroWrappers.push(wrapper);
 		
 		return tableElement;
 	}
 	
-	setWrapperClass(name){
-		this.table.wrappers.forEach((elem, index, array) => {
+	_sortTableRows(primaryHeader, isAscending){
+		const row = 0;
+		this.dataMatrix.sortByCol((a, b) => {
+			const result = -Infinity;
+			if(row !== 0){
+				const aStr = a.toString().toLowerCase();
+				const bStr = b.toString().toLowerCase();
+				
+				const char = 0;
+				while(true){
+					const aChar = aStr.charCodeAt(char);
+					const bChar = bStr.charCodeAt(char);
+					
+					if(aChar < bChar){
+						result = -1;
+						break;
+					}
+					if(aChar > bChar){
+						result = 1;
+						break;
+					}
+					if(aChar === undefined && bChar === undefined){
+						result = 0;
+						break;
+					}
+						
+					char++;
+				}
+			}
+			row++;
+			return result;
+		});
+	}
+	
+	setTableWrapperClass(name){
+		this.table.tableWrappers.forEach((elem, index, array) => {
+			elem.addClass(name);
+		});
+	}
+	
+	setMacroWrapperClass(name){
+		this.table.macroWrappers.forEach((elem, index, array) => {
 			elem.addClass(name);
 		});
 	}
