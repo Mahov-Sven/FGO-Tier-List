@@ -11,7 +11,7 @@ class Loader{
 	}
 	
 	static loadHTML(fileLocation, callback){
-		this.loadFile(fileLocation + htmlExt, function(html){
+		this.loadFile(`${fileLocation}.html`, function(html){
 			callback(html);
 		});
 	}

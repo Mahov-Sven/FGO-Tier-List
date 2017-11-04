@@ -1,6 +1,6 @@
 function globals() {
 }
-globals.banners = 2;
+globals.banners = 0;
 globals.servants = 2;
 
 const servants = [];
@@ -8,7 +8,7 @@ const measures = new Set();
 const searchMap = new Map();
 
 function setBanner(bannerID) {
-	document.body.style.backgroundImage = "url(files/images/banners/banner" + bannerID + ".png)";
+	document.body.style.backgroundImage = `url(files/images/banners/banner${bannerID}.png)`;
 	document.body.style.backgroundRepeat = "no-repeat";
 	document.body.style.backgroundAttachment = "fixed";
 	document.body.style.backgroundPosition = "center";
@@ -17,8 +17,6 @@ function setBanner(bannerID) {
 
 function statsOption(){
     const tableName = "StatsTable";
-//    const table = createOrderedTable(tableName, measures, servants, "Table", 
-//            "HeaderRow", "HeaderCell", "DataRowOdd", "DataRowEven", "DataCell");
     const table = new OrderedTable(tableName, measures, servants);
     
     table.setMacroWrapperClass("MacroWrapper");
@@ -64,7 +62,7 @@ function handleOptionClick(e) {
 }
 
 $(document).ready(() => {
-	setBanner(Util.randomInt(1, globals.banners));
+	if(globals.banners > 0) setBanner(Util.randomInt(1, globals.banners));
 
 	$(".Option").click(handleOptionClick);
 

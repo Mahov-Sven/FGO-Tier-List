@@ -14,46 +14,16 @@ class Util {
 	static randomInt(min = 0, max) {
 		return Math.round(Math.random() * (max - min)) + min;
 	}
-
-	static createTable(tableName, headers, dataRows, tableClass = undefined, headerRowClass = undefined, 
-	        headerCellClass = undefined, dataRowOddClass = undefined, dataRowEvenClass = undefined, 
-	        dataCellClass = undefined) {
-	    
-		const table = $("<table>");
-		if (tableClass !== undefined) table.addClass(tableClass);
-
-		/* Header */
-		const headerRow = $("<tr>");
-		if (headerRowClass !== undefined) headerRow.addClass(headerRowClass);
-		for (const header of headers) {
-			const headerCell = $("<th>");
-			if (headerCellClass !== undefined) headerCell.addClass(headerCellClass);
-
-			headerCell.text(header);
-			headerCell.attr("id", `${tableName}.${header}`);
-			headerRow.append(headerCell); }
-		table.append(headerRow);
-
-		/* Data */
-		let row = 1;
-		for (const data of dataRows) {
-			const dataRow = $("<tr>");
-			if (row % 2 === 1 && dataRowOddClass !== undefined) dataRow.addClass(dataRowOddClass);
-			if (row % 2 === 0 && dataRowEvenClass !== undefined) dataRow.addClass(dataRowEvenClass);
-
-			for (const header of headers) {
-				const dataCell = $("<td>");
-				if (dataCellClass !== undefined) dataCell.addClass(dataCellClass);
-				
-				dataCell.text(data[header]);
-				dataCell.attr("id", `${tableName}.${header}.${data[header]}`);
-				dataRow.append(dataCell);
-			}
-			table.append(dataRow);
-			row++;
+	
+	static orderStrings(str1, str2, isAscending){
+		const mult = isAscending ? 1 : -1;
+		const numb1 = +str1;
+		const numb2 = +str2;
+		if(!isNaN(numb1) && !isNaN(numb2)){
+			return str1 <= str2 ? mult : -mult;
+		}else{
+			return str1 <= str2 ? -mult : mult;
 		}
-
-		return table;
 	}
 }
 
@@ -73,8 +43,32 @@ class DataMatrix {
 		}
 	}
 	
-	sortByCol(measure){
-		this.matrix.sort(measure);
+	sortByCol(col, measure){
+		this.matrix.sort((a, b) => {
+			return measure(a[col] , b[col]);
+		});
+	}
+	
+	findInRow(row, keyword){
+		for(let col = 0; col < this.columns; col++){
+			if(this.matrix[row][col] === keyword) return col;
+		}
+		return undefined;
+	}
+	
+	findInCol(col, keyword){
+		for(let row = 0; row < this.rows; row++){
+			if(this.matrix[row][col] === keyword) return row;
+		}
+		return undefined;
+	}
+	
+	find(keyword){
+		for(let row = 0; row < this.rows; row++){
+			const col = this.findInRow(row, keyword);
+			if(col !== undefined) return [row, col];
+		}
+		return undefined;
 	}
 	
 	get(row, column){
@@ -134,27 +128,84 @@ class DataMatrix {
 class Table {
 
 	constructor(name, headers, dataArray) {
-		this._initTable(name, headers, dataArray);
+		this._initBefore(...arguments);
+		this._initConstruction(...arguments);
+		this._initAfter(...arguments);
 	}
 	
-	_initTable(name, headers, dataArray){
+	_initBefore(name, headers, dataArray){
 		this.name = name;
 		this.dataMatrix = new DataMatrix([...dataArray].length + 1, [...headers].length);
-		
 		this._setHeaders(headers);
 		this._setDataArray(dataArray);
-		this.table = this._constructTableElement(this.name, this.dataMatrix);
+		this.table = {};
+		this.appliedClasses = new Map();
+		this.appliedClasses.set("tables", "CLASS_NOT_SET");
+		this.appliedClasses.set("headerRow", "CLASS_NOT_SET");
+		this.appliedClasses.set("headerCells", "CLASS_NOT_SET");
+		this.appliedClasses.set("dataRowOdd", "CLASS_NOT_SET");
+		this.appliedClasses.set("dataRowEven", "CLASS_NOT_SET");
+		this.appliedClasses.set("dataCells", "CLASS_NOT_SET");
+	}
+	
+	_initConstruction(){
+		this.table = this._constructElement(this.name, this.dataMatrix);
+	}
+	
+	_initAfter(){
+		
+	}
+	
+	reconstruct(){
+		this.table = this._constructElement(this.name, this.dataMatrix);
 		this._updateTable();
+	}
+	
+	_constructTableElement(name){
+		const table = $("<table>");
+		table.attr("id", `${name}`);
+		table.addClass(this.appliedClasses.get("tables"));
+		
+		return table;
+	}
+	
+	_constructHeaderRowElement(){
+		const headerRow = $("<tr>");
+		headerRow.addClass(this.appliedClasses.get("headerRow"));
+		
+		return headerRow
 	}
 	
 	_constructHeaderCellElement(text, id){
 		const headerCell = $("<th>");
 		headerCell.text(text);
 		headerCell.attr("id", id);
+		headerCell.addClass(this.appliedClasses.get("headerCells"));
+		
 		return headerCell;
 	}
 	
-	_constructTableElement(name, dataMatrix){
+	_constructDataRowElement(isEven){
+		const dataRow = $("<tr>");
+		if(isEven){
+			dataRow.addClass(this.appliedClasses.get("dataRowEven"));
+		}else{
+			dataRow.addClass(this.appliedClasses.get("dataRowOdd"));
+		}
+		
+		return dataRow;
+	}
+	
+	_constructDataCell(name, header, data){
+		const dataCell = $("<td>");
+		dataCell.text(data);
+		dataCell.attr("id", `${name}.${header}.${data}`);
+		dataCell.addClass(this.appliedClasses.get("dataCells"));
+		
+		return dataCell;
+	}
+	
+	_constructElement(name, dataMatrix){
 		
 		const tableElement = {
 				element: undefined,
@@ -166,11 +217,10 @@ class Table {
 				dataCells: []
 			}
 		
-		const table = $("<table>");
-		table.attr("id", `${name}`);
+		const table = this._constructTableElement(name);
 
 		/* Header */
-		const headerRow = $("<tr>");
+		const headerRow = this._constructHeaderRowElement();
 		tableElement.headerRow = [headerRow];
 		for (const header of dataMatrix.getRow(0)) {
 			const headerCell = this._constructHeaderCellElement(header, `${name}.${header}`);
@@ -185,18 +235,17 @@ class Table {
 		/* Data */
 		for (let row = 1; row < dataMatrix.rows; row++) {
 			const dataR = dataMatrix.getRow(row);
-			const dataRow = $("<tr>");
+			const isEven = (row % 2) === 0;
+			const dataRow = this._constructDataRowElement(isEven);
 			
-			if(row % 2 == 0) tableElement.dataRowEven.push(dataRow);
-			if(row % 2 == 1) tableElement.dataRowOdd.push(dataRow);
+			if(isEven) tableElement.dataRowEven.push(dataRow);
+			if(!isEven) tableElement.dataRowOdd.push(dataRow);
 			
 			for (let col = 0; col < dataMatrix.columns; col++) {
 				const dataC = dataR[col];
 				const header = dataMatrix.get(0, col);
-				const dataCell = $("<td>");
+				const dataCell = this._constructDataCell(name, header, dataC);
 				
-				dataCell.text(dataC);
-				dataCell.attr("id", `${name}.${header}.${dataC}`);
 				dataRow.append(dataCell);
 				
 				tableElement.dataCells.push(dataCell);
@@ -221,7 +270,7 @@ class Table {
 	
 	setHeaders(headers){
 		this._setHeaders(headers);
-		this.table = this._constructTableElement(this.name, this.dataMatrix);
+		this.table = this._constructElement(this.name, this.dataMatrix);
 		this._updateTable();
 	}
 	
@@ -237,7 +286,7 @@ class Table {
 	
 	setDataArray(dataArray){
 		this._setDataArray(dataArray);
-		this.table = this._constructTableElement(this.name, this.dataMatrix);
+		this.table = this._constructElement(this.name, this.dataMatrix);
 		this._updateTable();
 	}
 	
@@ -245,30 +294,36 @@ class Table {
 		this.table.tables.forEach((elem, index, array) => {
 			elem.addClass(name);
 		});
+		this.appliedClasses.set("tables", name);
 	}
 	
 	setHeaderRowClass(name){
 		this.table.headerRow.forEach((elem, index, array) => {
 			elem.addClass(name);
 		});
+		this.appliedClasses.set("headerRow", name);
 	}
 	
 	setHeaderRowCellClass(name){
 		this.table.headerCells.forEach((elem, index, array) => {
 			elem.addClass(name);
 		});
+		this.appliedClasses.set("headerCells", name);
 	}
 	
 	setDataRowOddClass(name){
 		this.table.dataRowOdd.forEach((elem, index, array) => {
 			elem.addClass(name);
 		});
+		
+		this.appliedClasses.set("dataRowOdd", name);
 	}
 	
 	setDataRowEvenClass(name){
 		this.table.dataRowEven.forEach((elem, index, array) => {
 			elem.addClass(name);
 		});
+		this.appliedClasses.set("dataRowEven", name);
 	}
 	
 	setDataRowClass(name){
@@ -280,6 +335,7 @@ class Table {
 		this.table.dataCells.forEach((elem, index, array) => {
 			elem.addClass(name);
 		});
+		this.appliedClasses.set("dataCells", name);
 	}
 	
 	getElement(){
@@ -289,36 +345,45 @@ class Table {
 
 class OrderedTable extends Table{
 	
-	constructor(name, headers, dataArray, primaryHeader, isAscending = true) {
-		super(name, headers, dataArray);
-		
-		
+	constructor(name, headers, dataArray, primaryHeader = undefined, isAscending = true) {
+		super(name, headers, dataArray, primaryHeader, isAscending);
+	}
+	
+	_initBefore(name, headers, dataArray, primaryHeader, isAscending){
+		super._initBefore(name, headers, dataArray);
+		this.appliedClasses.set("macroWrappers", "CLASS_NOT_SET");
+		this.appliedClasses.set("tableWrappers", "CLASS_NOT_SET");
+		this.currentOrder = [primaryHeader, isAscending];
+		this._sortTableRows();
+	}
+	
+	reconstruct(){
+		/// GET THE SCROLL WORKING HERE
+		const scroll = $(`#${this.name}.DataTableWrapper`).offset();
+		this.table = this._constructElement(this.name, this.dataMatrix);
+		this.table.element.find(`#${this.name}.DataTableWrapper`).scrollLeft(scroll);
+		this._updateTable();
 	}
 	
 	_constructHeaderCellElement(text, id){
 		const headerCell = super._constructHeaderCellElement(text, id);
 		
 		headerCell.click((Event) => {
-			
+			const header = headerCell.text();
+			if(header === this.currentOrder[0]){
+				this.currentOrder[1] ^= true;
+			}else{
+				this.currentOrder[0] = header;
+				this.currentOrder[1] = true;
+			}
+			this._sortTableRows();
+			this.reconstruct();
 		});
 		
 		return headerCell;
 	}
 	
-	_constructTableElement(name, dataMatrix){
-		
-		const dataTable = super._constructTableElement(`DataTable.${name}`, dataMatrix);
-		
-		const PlaceHeader = "-";
-		const column = [];
-		column[0] = "-";
-		for(let i = 1; i < dataMatrix.rows; i++){
-			column[i] = i;
-		}
-		const placeMatrix = new DataMatrix(dataMatrix.rows, 1);
-		placeMatrix.setCol(0, column);
-		
-		const placeTable = super._constructTableElement(`PlaceTable.${name}`, placeMatrix);
+	_constructElement(name, dataMatrix){
 		
 		const tableElement = {
 				element: undefined,
@@ -332,6 +397,19 @@ class OrderedTable extends Table{
 				dataCells: []
 			}
 		
+		const dataTable = super._constructElement(`${name}.DataTable`, dataMatrix);
+		
+		const PlaceHeader = "-";
+		const column = [];
+		column[0] = "-";
+		for(let i = 1; i < dataMatrix.rows; i++){
+			column[i] = i;
+		}
+		const placeMatrix = new DataMatrix(dataMatrix.rows, 1);
+		placeMatrix.setCol(0, column);
+		
+		const placeTable = super._constructElement(`${name}.PlaceTable`, placeMatrix);
+		
 		tableElement.tables = [...dataTable.tables, ...placeTable.tables];
 		tableElement.headerRow = [...dataTable.headerRow, ...placeTable.headerRow];
 		tableElement.headerCells = [...dataTable.headerCells, ...placeTable.headerCells];
@@ -343,11 +421,15 @@ class OrderedTable extends Table{
 		dataTableWrapper.css("flex", "1 1 auto");
 		dataTableWrapper.css("overflow", "auto");
 		dataTableWrapper.append(dataTable.element);
+		dataTableWrapper.attr("id", `${name}.DataTableWrapper`);
+		dataTableWrapper.addClass(this.appliedClasses.get("tableWrappers"));
 		tableElement.tableWrappers.push(dataTableWrapper);
 		
 		const placeTableWrapper = $("<div>");
 		placeTableWrapper.css("flex", "0 0 auto");
 		placeTableWrapper.append(placeTable.element);
+		placeTableWrapper.attr("id", `${name}.PlaceTableWrapper`);
+		placeTableWrapper.addClass(this.appliedClasses.get("tableWrappers"));
 		tableElement.tableWrappers.push(placeTableWrapper);
 		
 		const wrapper = $("<div>");
@@ -355,55 +437,42 @@ class OrderedTable extends Table{
 		wrapper.append(placeTableWrapper);
 		wrapper.append(dataTableWrapper);
 		wrapper.attr("id", `${name}`);
+		wrapper.addClass(this.appliedClasses.get("macroWrappers"));
 		tableElement.element = wrapper;
 		tableElement.macroWrappers.push(wrapper);
 		
 		return tableElement;
 	}
 	
-	_sortTableRows(primaryHeader, isAscending){
-		const row = 0;
-		this.dataMatrix.sortByCol((a, b) => {
-			const result = -Infinity;
-			if(row !== 0){
-				const aStr = a.toString().toLowerCase();
-				const bStr = b.toString().toLowerCase();
-				
-				const char = 0;
-				while(true){
-					const aChar = aStr.charCodeAt(char);
-					const bChar = bStr.charCodeAt(char);
-					
-					if(aChar < bChar){
-						result = -1;
-						break;
-					}
-					if(aChar > bChar){
-						result = 1;
-						break;
-					}
-					if(aChar === undefined && bChar === undefined){
-						result = 0;
-						break;
-					}
-						
-					char++;
-				}
-			}
-			row++;
-			return result;
+	_sortTableRows(){
+		const keyword = this.currentOrder[0] === undefined ? this.dataMatrix.get(0, 0) : this.currentOrder[0];
+		const col = this.dataMatrix.findInRow(0, keyword);
+		this.dataMatrix.sortByCol(col, (a, b) => {
+			if(a === keyword) return -Infinity;
+			const aStr = a.toString().toLowerCase();
+			const bStr = b.toString().toLowerCase();
+			return Util.orderStrings(aStr, bStr, this.currentOrder[1]);
 		});
+	}
+	
+	_updateTable(){
+		const elemArr = $(`#${this.name}`);
+		if(elemArr.length === 1) elemArr.replaceWith(this.getElement());
 	}
 	
 	setTableWrapperClass(name){
 		this.table.tableWrappers.forEach((elem, index, array) => {
 			elem.addClass(name);
 		});
+		
+		this.appliedClasses.set("tableWrappers", name);
 	}
 	
 	setMacroWrapperClass(name){
 		this.table.macroWrappers.forEach((elem, index, array) => {
 			elem.addClass(name);
 		});
+		
+		this.appliedClasses.set("macroWrappers", name);
 	}
 }
