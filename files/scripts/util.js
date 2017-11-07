@@ -164,14 +164,14 @@ class Table {
 	_constructTableElement(name){
 		const table = $("<table>");
 		table.attr("id", `${name}`);
-		table.addClass(this.appliedClasses.get("tables"));
+		table.removeClass().addClass(this.appliedClasses.get("tables"));
 		
 		return table;
 	}
 	
 	_constructHeaderRowElement(){
 		const headerRow = $("<tr>");
-		headerRow.addClass(this.appliedClasses.get("headerRow"));
+		headerRow.removeClass().addClass(this.appliedClasses.get("headerRow"));
 		
 		return headerRow
 	}
@@ -180,7 +180,7 @@ class Table {
 		const headerCell = $("<th>");
 		headerCell.text(text);
 		headerCell.attr("id", id);
-		headerCell.addClass(this.appliedClasses.get("headerCells"));
+		headerCell.removeClass().addClass(this.appliedClasses.get("headerCells"));
 		
 		return headerCell;
 	}
@@ -188,9 +188,9 @@ class Table {
 	_constructDataRowElement(isEven){
 		const dataRow = $("<tr>");
 		if(isEven){
-			dataRow.addClass(this.appliedClasses.get("dataRowEven"));
+			dataRow.removeClass().addClass(this.appliedClasses.get("dataRowEven"));
 		}else{
-			dataRow.addClass(this.appliedClasses.get("dataRowOdd"));
+			dataRow.removeClass().addClass(this.appliedClasses.get("dataRowOdd"));
 		}
 		
 		return dataRow;
@@ -200,7 +200,7 @@ class Table {
 		const dataCell = $("<td>");
 		dataCell.text(data);
 		dataCell.attr("id", `${name}.${header}.${data}`);
-		dataCell.addClass(this.appliedClasses.get("dataCells"));
+		dataCell.removeClass().addClass(this.appliedClasses.get("dataCells"));
 		
 		return dataCell;
 	}
@@ -264,6 +264,10 @@ class Table {
 		if(elemArr.length === 1) elemArr.replaceWith(this.getElement());
 	}
 	
+	getWidth(){
+		return this.getElement();
+	}
+	
 	_setHeaders(headers){
 		this.dataMatrix.setRow(0, headers);
 	}
@@ -292,28 +296,28 @@ class Table {
 	
 	setTableClass(name){
 		this.table.tables.forEach((elem, index, array) => {
-			elem.addClass(name);
+			elem.removeClass().addClass(name);
 		});
 		this.appliedClasses.set("tables", name);
 	}
 	
 	setHeaderRowClass(name){
 		this.table.headerRow.forEach((elem, index, array) => {
-			elem.addClass(name);
+			elem.removeClass().addClass(name);
 		});
 		this.appliedClasses.set("headerRow", name);
 	}
 	
 	setHeaderRowCellClass(name){
 		this.table.headerCells.forEach((elem, index, array) => {
-			elem.addClass(name);
+			elem.removeClass().addClass(name);
 		});
 		this.appliedClasses.set("headerCells", name);
 	}
 	
 	setDataRowOddClass(name){
 		this.table.dataRowOdd.forEach((elem, index, array) => {
-			elem.addClass(name);
+			elem.removeClass().addClass(name);
 		});
 		
 		this.appliedClasses.set("dataRowOdd", name);
@@ -321,7 +325,7 @@ class Table {
 	
 	setDataRowEvenClass(name){
 		this.table.dataRowEven.forEach((elem, index, array) => {
-			elem.addClass(name);
+			elem.removeClass().addClass(name);
 		});
 		this.appliedClasses.set("dataRowEven", name);
 	}
@@ -333,7 +337,7 @@ class Table {
 	
 	setDataCellClass(name){
 		this.table.dataCells.forEach((elem, index, array) => {
-			elem.addClass(name);
+			elem.removeClass().addClass(name);
 		});
 		this.appliedClasses.set("dataCells", name);
 	}
@@ -351,6 +355,7 @@ class OrderedTable extends Table{
 	
 	_initBefore(name, headers, dataArray, primaryHeader, isAscending){
 		super._initBefore(name, headers, dataArray);
+		this.scroll = 0;
 		this.appliedClasses.set("macroWrappers", "CLASS_NOT_SET");
 		this.appliedClasses.set("tableWrappers", "CLASS_NOT_SET");
 		this.currentOrder = [primaryHeader, isAscending];
@@ -358,15 +363,18 @@ class OrderedTable extends Table{
 	}
 	
 	reconstruct(){
-		/// GET THE SCROLL WORKING HERE
-		const scroll = $(`#${this.name}.DataTableWrapper`).offset();
+		const scroll = this.scroll;
 		this.table = this._constructElement(this.name, this.dataMatrix);
-		this.table.element.find(`#${this.name}.DataTableWrapper`).scrollLeft(scroll);
+		this.table.element.find(`#${this.name}\\.DataTableWrapper`).scrollLeft(scroll);
+		console.log(this.table.element.find(`#${this.name}\\.DataTableWrapper`));
 		this._updateTable();
 	}
 	
 	_constructHeaderCellElement(text, id){
 		const headerCell = super._constructHeaderCellElement(text, id);
+		
+		const arrowDecorator = $("<div>");
+		headerCell.append(arrowDecorator);
 		
 		headerCell.click((Event) => {
 			const header = headerCell.text();
@@ -381,6 +389,20 @@ class OrderedTable extends Table{
 		});
 		
 		return headerCell;
+	}
+	
+	_constructDataTableWrapperElement(name){
+		const dataTableWrapper = $("<div>");
+		dataTableWrapper.css("flex", "1 1 auto");
+		dataTableWrapper.css("overflow", "auto");
+		dataTableWrapper.attr("id", name);
+		dataTableWrapper.removeClass().addClass(this.appliedClasses.get("tableWrappers"));
+		
+		dataTableWrapper.scroll((event, table = this) => {
+			table._setScroll(dataTableWrapper.scrollLeft());
+		});
+		
+		return dataTableWrapper;
 	}
 	
 	_constructElement(name, dataMatrix){
@@ -417,19 +439,15 @@ class OrderedTable extends Table{
 		tableElement.dataRowEven = [...dataTable.dataRowEven, ...placeTable.dataRowEven];
 		tableElement.dataCells = [...dataTable.dataCells, ...placeTable.dataCells];
 		
-		const dataTableWrapper = $("<div>");
-		dataTableWrapper.css("flex", "1 1 auto");
-		dataTableWrapper.css("overflow", "auto");
+		const dataTableWrapper = this._constructDataTableWrapperElement(`${name}.DataTableWrapper`);
 		dataTableWrapper.append(dataTable.element);
-		dataTableWrapper.attr("id", `${name}.DataTableWrapper`);
-		dataTableWrapper.addClass(this.appliedClasses.get("tableWrappers"));
 		tableElement.tableWrappers.push(dataTableWrapper);
 		
 		const placeTableWrapper = $("<div>");
 		placeTableWrapper.css("flex", "0 0 auto");
 		placeTableWrapper.append(placeTable.element);
 		placeTableWrapper.attr("id", `${name}.PlaceTableWrapper`);
-		placeTableWrapper.addClass(this.appliedClasses.get("tableWrappers"));
+		placeTableWrapper.removeClass().addClass(this.appliedClasses.get("tableWrappers"));
 		tableElement.tableWrappers.push(placeTableWrapper);
 		
 		const wrapper = $("<div>");
@@ -437,7 +455,7 @@ class OrderedTable extends Table{
 		wrapper.append(placeTableWrapper);
 		wrapper.append(dataTableWrapper);
 		wrapper.attr("id", `${name}`);
-		wrapper.addClass(this.appliedClasses.get("macroWrappers"));
+		wrapper.removeClass().addClass(this.appliedClasses.get("macroWrappers"));
 		tableElement.element = wrapper;
 		tableElement.macroWrappers.push(wrapper);
 		
@@ -460,9 +478,13 @@ class OrderedTable extends Table{
 		if(elemArr.length === 1) elemArr.replaceWith(this.getElement());
 	}
 	
+	_setScroll(scroll){
+		this.scroll = scroll;
+	}
+	
 	setTableWrapperClass(name){
 		this.table.tableWrappers.forEach((elem, index, array) => {
-			elem.addClass(name);
+			elem.removeClass().addClass(name);
 		});
 		
 		this.appliedClasses.set("tableWrappers", name);
@@ -470,7 +492,7 @@ class OrderedTable extends Table{
 	
 	setMacroWrapperClass(name){
 		this.table.macroWrappers.forEach((elem, index, array) => {
-			elem.addClass(name);
+			elem.removeClass().addClass(name);
 		});
 		
 		this.appliedClasses.set("macroWrappers", name);

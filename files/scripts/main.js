@@ -28,7 +28,6 @@ function statsOption(){
     table.setDataRowEvenClass("DataRowEven");
     table.setDataCellClass("DataCell");
     
-    
     $("#CONTENT_SPACE").append(table.getElement());
     
     searchMap.clear();
