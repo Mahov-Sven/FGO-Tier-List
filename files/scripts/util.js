@@ -461,6 +461,7 @@ class OrderedTable extends Table{
 		const dataTableHeaders = dataTableWrapper.find("th");
 		for(const dataTableHeader of dataTableHeaders){
 			const arrowDecorator = this._constructArrowDecorator();
+			
 			dataTableHeader
 		}
 		
