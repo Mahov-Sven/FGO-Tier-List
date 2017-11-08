@@ -378,7 +378,6 @@ class OrderedTable extends Table{
 	
 	_initBefore(name, headers, dataArray, primaryHeader, isAscending){
 		super._initBefore(name, headers, dataArray);
-		this.scroll = 0;
 		this.appliedClasses.set("macroWrappers", "CLASS_NOT_SET");
 		this.appliedClasses.set("tableWrappers", "CLASS_NOT_SET");
 		this.currentOrder = [primaryHeader, isAscending];
@@ -388,11 +387,14 @@ class OrderedTable extends Table{
 		this._sortTableRows();
 	}
 	
+	_constructArrowDecorator(){
+		const arrowDecorator = $("<img>");
+		
+		return arrowDecorator();
+	}
+	
 	_constructHeaderCellElement(text, id){
 		const headerCell = super._constructHeaderCellElement(text, id);
-		
-		const arrowDecorator = $("<div>");
-		headerCell.append(arrowDecorator);
 		
 		headerCell.click((Event) => {
 			const header = headerCell.text();
@@ -414,10 +416,6 @@ class OrderedTable extends Table{
 		dataTableWrapper.css("overflow", "auto");
 		dataTableWrapper.attr("id", name);
 		dataTableWrapper.removeClass().addClass(this.appliedClasses.get("tableWrappers"));
-		
-		dataTableWrapper.scroll((event, table = this) => {
-			table._setScroll(dataTableWrapper.scrollLeft());
-		});
 		
 		return dataTableWrapper;
 	}
@@ -459,6 +457,12 @@ class OrderedTable extends Table{
 		const dataTableWrapper = this._constructDataTableWrapperElement(`${name}.DataTable.Wrapper`);
 		dataTableWrapper.append(dataTable.element);
 		tableElement.tableWrappers.add(dataTableWrapper);
+		
+		const dataTableHeaders = dataTableWrapper.find("th");
+		for(const dataTableHeader of dataTableHeaders){
+			const arrowDecorator = this._constructArrowDecorator();
+			dataTableHeader
+		}
 		
 		const placeTableWrapper = $("<div>");
 		placeTableWrapper.css("flex", "0 0 auto");
