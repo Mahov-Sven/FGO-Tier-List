@@ -20,11 +20,22 @@ class Util {
 		const numb1 = +str1;
 		const numb2 = +str2;
 		if(!isNaN(numb1) && !isNaN(numb2)){
-			return str1 <= str2 ? mult : -mult;
+			return numb1 < numb2 ? -mult : mult;
 		}else{
-			return str1 <= str2 ? -mult : mult;
+			return str1 < str2 ? -mult : mult;
 		}
 	}
+}
+
+Set.prototype.addAll = function(values){
+	for(value of values){
+		this.add(value);
+	}
+}
+
+Set.prototype.setAll = function(values){
+	this.clear();
+	this.addAll(values);
 }
 
 
@@ -43,7 +54,19 @@ class DataMatrix {
 		}
 	}
 	
-	sortByCol(col, measure){
+	insertFrom(row1, row2){
+		const elem = this.matrix[row1];
+		this.matrix.splice(row1, 1);
+		this.matrix.splice(row2, 0, elem);
+	}
+	
+	swapRow(row1, row2){
+		const temp = this.matrix[row1];
+		this.matrix[row1] = this.matrix[row2];
+		this.matrix[row2] = temp;
+	}
+	
+	sortRows(col, measure){
 		this.matrix.sort((a, b) => {
 			return measure(a[col] , b[col]);
 		});
@@ -209,12 +232,12 @@ class Table {
 		
 		const tableElement = {
 				element: undefined,
-				tables: [],
-				headerRow: [],
-				headerCells: [],
-				dataRowOdd: [],
-				dataRowEven: [],
-				dataCells: []
+				tables: new Set(),
+				headerRow: new Set(),
+				headerCells: new Set(),
+				dataRowOdd: new Set(),
+				dataRowEven: new Set(),
+				dataCells: new Set()
 			}
 		
 		const table = this._constructTableElement(name);
@@ -226,7 +249,7 @@ class Table {
 			const headerCell = this._constructHeaderCellElement(header, `${name}.${header}`);
 			headerRow.append(headerCell); 
 			
-			tableElement.headerCells.push(headerCell);
+			tableElement.headerCells.add(headerCell);
 		}
 		
 		
@@ -238,8 +261,8 @@ class Table {
 			const isEven = (row % 2) === 0;
 			const dataRow = this._constructDataRowElement(isEven);
 			
-			if(isEven) tableElement.dataRowEven.push(dataRow);
-			if(!isEven) tableElement.dataRowOdd.push(dataRow);
+			if(isEven) tableElement.dataRowEven.add(dataRow);
+			if(!isEven) tableElement.dataRowOdd.add(dataRow);
 			
 			for (let col = 0; col < dataMatrix.columns; col++) {
 				const dataC = dataR[col];
@@ -248,12 +271,12 @@ class Table {
 				
 				dataRow.append(dataCell);
 				
-				tableElement.dataCells.push(dataCell);
+				tableElement.dataCells.add(dataCell);
 			}
 			table.append(dataRow);
 		}
 		
-		tableElement.tables.push(table);
+		tableElement.tables.add(table);
 		tableElement.element = table;
 		
 		return tableElement;
@@ -359,15 +382,10 @@ class OrderedTable extends Table{
 		this.appliedClasses.set("macroWrappers", "CLASS_NOT_SET");
 		this.appliedClasses.set("tableWrappers", "CLASS_NOT_SET");
 		this.currentOrder = [primaryHeader, isAscending];
-		this._sortTableRows();
 	}
 	
-	reconstruct(){
-		const scroll = this.scroll;
-		this.table = this._constructElement(this.name, this.dataMatrix);
-		this.table.element.find(`#${this.name}\\.DataTableWrapper`).scrollLeft(scroll);
-		console.log(this.table.element.find(`#${this.name}\\.DataTableWrapper`));
-		this._updateTable();
+	_initAfter(){
+		this._sortTableRows();
 	}
 	
 	_constructHeaderCellElement(text, id){
@@ -379,13 +397,13 @@ class OrderedTable extends Table{
 		headerCell.click((Event) => {
 			const header = headerCell.text();
 			if(header === this.currentOrder[0]){
-				this.currentOrder[1] ^= true;
+				this.currentOrder[1] = !this.currentOrder[1];
 			}else{
 				this.currentOrder[0] = header;
 				this.currentOrder[1] = true;
 			}
 			this._sortTableRows();
-			this.reconstruct();
+			//this.reconstruct();
 		});
 		
 		return headerCell;
@@ -409,14 +427,14 @@ class OrderedTable extends Table{
 		
 		const tableElement = {
 				element: undefined,
-				macroWrappers: [],
-				tableWrappers: [],
-				tables: [],
-				headerRow: [],
-				headerCells: [],
-				dataRowOdd: [],
-				dataRowEven: [],
-				dataCells: []
+				macroWrappers: new Set(),
+				tableWrappers: new Set(),
+				tables: new Set(),
+				headerRow: new Set(),
+				headerCells: new Set(),
+				dataRowOdd: new Set(),
+				dataRowEven: new Set(),
+				dataCells: new Set()
 			}
 		
 		const dataTable = super._constructElement(`${name}.DataTable`, dataMatrix);
@@ -432,23 +450,23 @@ class OrderedTable extends Table{
 		
 		const placeTable = super._constructElement(`${name}.PlaceTable`, placeMatrix);
 		
-		tableElement.tables = [...dataTable.tables, ...placeTable.tables];
-		tableElement.headerRow = [...dataTable.headerRow, ...placeTable.headerRow];
-		tableElement.headerCells = [...dataTable.headerCells, ...placeTable.headerCells];
-		tableElement.dataRowOdd = [...dataTable.dataRowOdd, ...placeTable.dataRowOdd];
-		tableElement.dataRowEven = [...dataTable.dataRowEven, ...placeTable.dataRowEven];
-		tableElement.dataCells = [...dataTable.dataCells, ...placeTable.dataCells];
+		tableElement.tables.setAll([...dataTable.tables, ...placeTable.tables]);
+		tableElement.headerRow.setAll([...dataTable.headerRow, ...placeTable.headerRow]);
+		tableElement.headerCells.setAll([...dataTable.headerCells, ...placeTable.headerCells]);
+		tableElement.dataRowOdd.setAll([...dataTable.dataRowOdd, ...placeTable.dataRowOdd]);
+		tableElement.dataRowEven.setAll([...dataTable.dataRowEven, ...placeTable.dataRowEven]);
+		tableElement.dataCells.setAll([...dataTable.dataCells, ...placeTable.dataCells]);
 		
-		const dataTableWrapper = this._constructDataTableWrapperElement(`${name}.DataTableWrapper`);
+		const dataTableWrapper = this._constructDataTableWrapperElement(`${name}.DataTable.Wrapper`);
 		dataTableWrapper.append(dataTable.element);
-		tableElement.tableWrappers.push(dataTableWrapper);
+		tableElement.tableWrappers.add(dataTableWrapper);
 		
 		const placeTableWrapper = $("<div>");
 		placeTableWrapper.css("flex", "0 0 auto");
 		placeTableWrapper.append(placeTable.element);
-		placeTableWrapper.attr("id", `${name}.PlaceTableWrapper`);
+		placeTableWrapper.attr("id", `${name}.PlaceTable.Wrapper`);
 		placeTableWrapper.removeClass().addClass(this.appliedClasses.get("tableWrappers"));
-		tableElement.tableWrappers.push(placeTableWrapper);
+		tableElement.tableWrappers.add(placeTableWrapper);
 		
 		const wrapper = $("<div>");
 		wrapper.css("display", "inline-flex");
@@ -457,20 +475,58 @@ class OrderedTable extends Table{
 		wrapper.attr("id", `${name}`);
 		wrapper.removeClass().addClass(this.appliedClasses.get("macroWrappers"));
 		tableElement.element = wrapper;
-		tableElement.macroWrappers.push(wrapper);
+		tableElement.macroWrappers.add(wrapper);
 		
 		return tableElement;
 	}
 	
 	_sortTableRows(){
+		/*
 		const keyword = this.currentOrder[0] === undefined ? this.dataMatrix.get(0, 0) : this.currentOrder[0];
 		const col = this.dataMatrix.findInRow(0, keyword);
-		this.dataMatrix.sortByCol(col, (a, b) => {
+		this.dataMatrix.sortRows(col, (a, b) => {
 			if(a === keyword) return -Infinity;
 			const aStr = a.toString().toLowerCase();
 			const bStr = b.toString().toLowerCase();
 			return Util.orderStrings(aStr, bStr, this.currentOrder[1]);
 		});
+		*/
+		const keyword = this.currentOrder[0] === undefined ? this.dataMatrix.get(0, 0) : this.currentOrder[0];
+		const col = this.dataMatrix.findInRow(0, keyword);
+		
+		const table = $(`#${this.name}\\.DataTable.Table`);
+		
+		const width = this.dataMatrix.rows;
+		let index = 1;
+		for(let row = 1; row < width; row++){
+			const elemStr = this.dataMatrix.get(row, col).toString().toLowerCase();
+			
+			let s = 1;
+			let e = row;
+			while(s !== e){
+				const m = Math.floor((s + e) / 2);
+				const mElem = this.dataMatrix.get(m, col).toString().toLowerCase();
+				const order = Util.orderStrings(elemStr, mElem, this.currentOrder[1])
+				if(order < 0){
+					e = m;
+				}else{
+					s = m + 1;
+				}
+			}
+			const elem = table.children().eq(row);
+			const target = table.children().eq(s - 1);
+			elem.insertAfter(target);
+			this.dataMatrix.insertFrom(row, s);
+			if(s % 2 == 0){
+				this.table.dataRowOdd.delete(elem);
+				this.table.dataRowEven.add(elem);
+				elem.removeClass().addClass(this.appliedClasses.get("dataRowEven"));
+			}else{
+				this.table.dataRowEven.delete(elem);
+				this.table.dataRowOdd.add(elem);
+				elem.removeClass().addClass(this.appliedClasses.get("dataRowOdd"));
+			}
+		}
 	}
 	
 	_updateTable(){

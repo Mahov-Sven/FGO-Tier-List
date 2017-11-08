@@ -1,7 +1,7 @@
 function globals() {
 }
 globals.banners = 0;
-globals.servants = 2;
+globals.servants = 3;
 
 const servants = [];
 const measures = new Set();
