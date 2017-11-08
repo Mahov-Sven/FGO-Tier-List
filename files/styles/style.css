@@ -155,10 +155,6 @@
 			border-color: rgba(64, 64, 64, 0.3);
 			border-style: solid;
 		}
-		
-		.Table .DataCell + .DataCell {
-			
-		}
 
 *{
 	padding: 0;

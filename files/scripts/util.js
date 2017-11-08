@@ -403,7 +403,6 @@ class OrderedTable extends Table{
 				this.currentOrder[1] = true;
 			}
 			this._sortTableRows();
-			//this.reconstruct();
 		});
 		
 		return headerCell;
@@ -481,16 +480,6 @@ class OrderedTable extends Table{
 	}
 	
 	_sortTableRows(){
-		/*
-		const keyword = this.currentOrder[0] === undefined ? this.dataMatrix.get(0, 0) : this.currentOrder[0];
-		const col = this.dataMatrix.findInRow(0, keyword);
-		this.dataMatrix.sortRows(col, (a, b) => {
-			if(a === keyword) return -Infinity;
-			const aStr = a.toString().toLowerCase();
-			const bStr = b.toString().toLowerCase();
-			return Util.orderStrings(aStr, bStr, this.currentOrder[1]);
-		});
-		*/
 		const keyword = this.currentOrder[0] === undefined ? this.dataMatrix.get(0, 0) : this.currentOrder[0];
 		const col = this.dataMatrix.findInRow(0, keyword);
 		
@@ -517,7 +506,11 @@ class OrderedTable extends Table{
 			const target = table.children().eq(s - 1);
 			elem.insertAfter(target);
 			this.dataMatrix.insertFrom(row, s);
-			if(s % 2 == 0){
+		}
+		
+		for(let row = 1; row < width; row++){
+			const elem = table.children().eq(row);
+			if(row % 2 == 0){
 				this.table.dataRowOdd.delete(elem);
 				this.table.dataRowEven.add(elem);
 				elem.removeClass().addClass(this.appliedClasses.get("dataRowEven"));
