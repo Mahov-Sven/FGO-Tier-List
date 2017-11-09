@@ -390,7 +390,7 @@ class OrderedTable extends Table{
 	_constructArrowDecorator(){
 		const arrowDecorator = $("<img>");
 		
-		return arrowDecorator();
+		return arrowDecorator;
 	}
 	
 	_constructHeaderCellElement(text, id){
@@ -398,6 +398,7 @@ class OrderedTable extends Table{
 		
 		headerCell.click((Event) => {
 			const header = headerCell.text();
+			if(`${this.name}.PlaceTable.${header}` === headerCell.attr("id")) return;
 			if(header === this.currentOrder[0]){
 				this.currentOrder[1] = !this.currentOrder[1];
 			}else{
@@ -462,7 +463,7 @@ class OrderedTable extends Table{
 		for(const dataTableHeader of dataTableHeaders){
 			const arrowDecorator = this._constructArrowDecorator();
 			
-			dataTableHeader
+			//dataTableHeader
 		}
 		
 		const placeTableWrapper = $("<div>");

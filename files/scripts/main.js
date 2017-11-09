@@ -1,7 +1,7 @@
 function globals() {
 }
 globals.banners = 0;
-globals.servants = 3;
+globals.servants = 9;
 
 const servants = [];
 const measures = new Set();
@@ -65,7 +65,7 @@ $(document).ready(() => {
 
 	$(".Option").click(handleOptionClick);
 
-	for (let id = 1; id <= globals.servants; id++) {
+	for (let id = 0; id <= globals.servants; id++) {
 		Loader.loadServantFile(id, (servant) => {
 			servants.push(servant);
 			for (const measure in servant) {

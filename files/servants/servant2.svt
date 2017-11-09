@@ -1,4 +1,7 @@
+ID:					2
 Name:				Artoria Pendragon
+Class:				Saber
+Stars:				★★★★★
 Max Heath:			15150
 Max Attack:			11221
 Grail Health:		16597
@@ -7,4 +10,7 @@ Attribute:			Earth
 Star Absorption:	102
 NP Per Attack:		0.86
 NP Per Hit:			3.0
-Death Rate:			21.0
+Death Rate:			21
+Nicknames:			King of Knights, Altria Pendragon
+Alignment:			Lawful Good
+Gender:				Female

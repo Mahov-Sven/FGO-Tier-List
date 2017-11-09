@@ -1,4 +1,7 @@
+ID:					3
 Name:				Artoria Pendragon (Alter)
+Class:				Saber
+Stars:				★★★★
 Max Heath:			11589
 Max Attack:			10248
 Grail Health:		14051
@@ -8,3 +11,6 @@ Star Absorption:	99
 NP Per Attack:		0.86
 NP Per Hit:			3.0
 Death Rate:			19.2
+Nicknames:			Saber Alter
+Alignment:			Lawful Evil
+Gender:				Female

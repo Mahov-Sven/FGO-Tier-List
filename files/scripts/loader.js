@@ -22,13 +22,13 @@ class Loader{
 			const lines = content.split("\n");
 			
 			const servant = {};
-			servant["ID"] = id;
 			for(const line of lines){
 				const parts = line.split(":");
 				const property = parts[0];
 				const value = parts[1];
+				const valueIsEmpty = (value.replace(/\s/g, "") === "");
 				const numValue = +value;
-				if(isNaN(numValue)){
+				if(isNaN(numValue) || valueIsEmpty){
 					// Value is a string
 					servant[property] = value;
 				}else{
