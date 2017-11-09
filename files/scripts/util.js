@@ -25,6 +25,10 @@ class Util {
 			return str1 < str2 ? -mult : mult;
 		}
 	}
+	
+	static div(){
+		return $("<div>");
+	}
 }
 
 Set.prototype.addAll = function(values){
@@ -148,7 +152,153 @@ class DataMatrix {
 	}
 }
 
-class Table {
+class TableMatrix {
+	
+	constructor(rows, columns){
+		this.rows = rows;
+		this.columns = columns;
+		this.table = undefined;
+	}
+	
+	_constructTableCell(){
+		const cell = Util.div();
+		
+		return cell;
+	}
+	
+	_constructTableRow(){
+		const row = Util.div();
+		
+		return row;
+	}
+	
+	_constructTableContainer(){
+		const container = Util.div();
+		
+		return container;
+	}
+	
+	_constructElement(){
+		const tableElem = this._constructTableContainer();
+		this.table = tableElem;
+		
+		for(let row = 0; row < this.rows; row++){
+			const rowElem = this._constructTableRow();
+			
+			this.table.append(rowElem);
+			for(let col = 0; col < this.columns; col++){
+				const cellElem = this._constructTableCell();
+				
+				rowElem.apend(cellElem);
+			}
+		}
+	}
+	
+	insertRow(rowSrc, rowDest){
+		this.getRow(rowDest).before(this.getRow(rowSrc));
+	}
+	
+	sortRowsByCol(col, measure){
+		for(let row = 0; row < this.rows; row++){
+			const dataA = this.getData(row, col);
+			
+			let start = 0;
+			let end = row;
+			while(start !== end){
+				const middle = Math.floor((start + end) / 2);
+				const dataB = this.get(middle, col);
+				const order = measure(dataA, dataB);
+				
+				if(order < 0){
+					end = middle;
+				}else{
+					start = middle + 1;
+				}
+			}
+			
+			this.insertRow(row, start);
+		}
+	}
+	
+	findInRow(row, keyword){
+		
+		for(let col = 0; col < this.columns; col++){
+			if(this.getData(row, col) === keyword) return col;
+		}
+		return undefined;
+		
+	}
+	
+	findInCol(col, keyword){
+		for(let row = 0; row < this.rows; row++){
+			if(this.getData(row, col) === keyword) return row;
+		}
+		return undefined;
+	}
+	
+	find(keyword){
+		
+		for(let row = 0; row < this.rows; row++){
+			const col = this.findInRow(row, keyword);
+			if(col !== undefined) return [row, col];
+		}
+		return undefined;
+		
+	}
+	
+	get(row, col){
+		return this.table.children().eq(row).chilren().eq(col);
+	}
+	
+	getData(row, col){
+		return this.get(row, col).text();
+	}
+	
+	getRow(row){
+		return this.table.children().eq(row);
+	}
+	
+	getRowData(row){
+		const result = [];
+		for(let col = 0; col < this.columns; col++){
+			result.push(getData(row, col));
+		}
+	}
+	
+	getColData(col){
+		const result = [];
+		for(let row = 0; row < this.rows; row++){
+			result.push(getData(row, col));
+		}
+		return result;
+	}
+	
+	getContainer(){
+		return this.table;
+	}
+	
+	setData(row, col, object){
+		this.get(row, col).text(object.toString());
+	}
+	
+	setRow(row, objects){
+		let col = 0;
+		for(const object of objects){
+			this.setData(row, col)
+			col++;
+		}
+	}
+	
+	setCol(col, objects){
+		let row = 0;
+		for(const object of objects){
+			this.setData(row, col)
+			row++;
+		}
+	}
+}
+
+class oTable {
 
 	constructor(name, headers, dataArray) {
 		this._initBefore(...arguments);
@@ -370,7 +520,7 @@ class Table {
 	}
 }
 
-class OrderedTable extends Table{
+class OrderedTable extends oTable{
 	
 	constructor(name, headers, dataArray, primaryHeader = undefined, isAscending = true) {
 		super(name, headers, dataArray, primaryHeader, isAscending);
