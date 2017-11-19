@@ -30,6 +30,10 @@ function statsOption(){
     
     $("#CONTENT_SPACE").append(table.getElement());
     
+    const test = new TableMatrix()
+    
+    $("#CONTENT_SPACE").append(table.getElement());
+    
     searchMap.clear();
     for(const measure of measures){
         searchMap.set(measure, `${tableName}.${measure}`);

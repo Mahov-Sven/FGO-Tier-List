@@ -154,10 +154,22 @@ class DataMatrix {
 
 class TableMatrix {
 	
-	constructor(rows, columns){
+	constructor(){
 		this.rows = rows;
 		this.columns = columns;
 		this.table = undefined;
+	}
+	
+	_updateRowCount(){
+		this.rows = this.table === undefined ? 0 : this.table.children().length;
+	}
+	_updateColumnCount(){
+		const most = 0;
+		for(let i = 0; i < this.rows; i++){
+			const cols = this.getRow(i).children().length;
+			most = cols > most ? cols : most;
+		}
+		this.columns = most;
 	}
 	
 	_constructTableCell(){
@@ -189,12 +201,12 @@ class TableMatrix {
 			for(let col = 0; col < this.columns; col++){
 				const cellElem = this._constructTableCell();
 				
-				rowElem.apend(cellElem);
+				rowElem.append(cellElem);
 			}
 		}
 	}
 	
-	insertRow(rowSrc, rowDest){
+	insertRowFrom(rowSrc, rowDest){
 		this.getRow(rowDest).before(this.getRow(rowSrc));
 	}
 	
@@ -246,6 +258,14 @@ class TableMatrix {
 		
 	}
 	
+	rows(){
+		return this.rows;
+	}
+	
+	columns(){
+		return this.columns;
+	}
+	
 	get(row, col){
 		return this.table.children().eq(row).chilren().eq(col);
 	}
@@ -273,7 +293,7 @@ class TableMatrix {
 		return result;
 	}
 	
-	getContainer(){
+	getElement(){
 		return this.table;
 	}
 	
